@@ -1,5 +1,7 @@
 class CommentResource < JSONAPI::Resource
-    attributes :description
-    belongs_to :user
-    belongs_to :article
-  end
+  attributes :description
+  has_one :user
+  has_one :article
+
+  paginator :paged
+end

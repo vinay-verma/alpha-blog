@@ -1,33 +1,34 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::Base
+  include JSONAPI::ActsAsResourceController
+  include Pundit
 
-    include Pundit, JSONAPI::ActsAsResourceController
+  protect_from_forgery with: :null_session
 
-    protect_from_forgery with: :null_session
+  helper_method :current_user, :logged_in?
 
-    helper_method :current_user, :logged_in?
+  def current_user
+    @current_user ||= User.find(session[:user_id]) if session[:user_id]
+  end
 
-    def current_user
-        @current_user ||= User.find(session[:user_id]) if session[:user_id]
+  def logged_in?
+    !!current_user
+  end
+
+  def require_user
+    unless logged_in?
+      flash[:alert] = 'You must be logged in to perform that action'
+      redirect_to login_path
     end
+  end
 
-    def logged_in?
-        !!current_user
-    end
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-    def require_user
-        if !logged_in?
-            flash[:alert] = "You must be logged in to perform that action"
-            redirect_to login_path
-        end
-    end
+  private
 
-    rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-
-    private
-  
-    def user_not_authorized
-      flash[:alert] = "You are not authorized to perform this action."
-      redirect_to(request.referrer || root_path)
-    end
-
+  def user_not_authorized
+    flash[:alert] = 'You are not authorized to perform this action.'
+    redirect_to(request.referrer || root_path)
+  end
 end
