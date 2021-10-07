@@ -1,0 +1,22 @@
+<h1> Comments for the post </h1>
+    <h2><%= @article.title %></h2>
+    <br>
+<% if @comments %>
+<% @comments.each do |item|%>
+    <%= item.description %>
+    <%= item.user.username %>
+    <hr>
+<% end %>
+<% end %>
+
+<%= form_with(url: "#{article_path(@article)}/comments", method: :post, local: true) do |f| %>
+    <p>
+        <%= f.label :comment %>
+        <br>
+        <%= f.text_area :description %>
+    </p>
+
+    <p>
+        <%= f.submit%>
+    </p>
+<% end %>

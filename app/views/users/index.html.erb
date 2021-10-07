@@ -1,0 +1,31 @@
+<h1>Alpha Bloggers</h1>
+
+<%= will_paginate @articles%>
+
+
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Profile pic</th>
+            <th>Number of articles written</th>
+            <th colspan = "2">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% @users.each do |user| %>
+                    <tr>
+                        <td><%= link_to user.username, user %></td>
+                        <td><%= link_to gravatar_for(user), user %></td>
+                        <td><%= pluralize(user.articles.count, "articles") %></td>
+                        <td><%= link_to 'View profile', user %></td>
+                        <% if logged_in? && (user == current_user || current_user.admin?) %>
+                        <td>
+                            <%= link_to 'Edit profile', edit_user_path(user)%>
+                            <td><%= link_to 'Delete profile', user, method: :delete, data: { confirm: "Are you sure?"} %></td>
+                        </td>
+                        <% end %>
+                    </tr>
+        <% end %>
+    </tbody>
+</table>
